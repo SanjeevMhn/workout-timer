@@ -31,7 +31,7 @@ function App() {
   };
 
   const showStartbtn = useMemo(() => {
-    if ((hr !== undefined && hr > 0 ) || (min !== undefined && min > 0) || (sec !== undefined && sec > 0)) {
+    if ((hr !== undefined && hr > 0) || (min !== undefined && min > 0) || (sec !== undefined && sec > 0)) {
       return true;
     }
     return false;
@@ -87,7 +87,9 @@ function App() {
 
   useEffect(() => {
     let audioInterval: any;
-    if(timerSound.current == null) timerSound.current = new Audio(sound);
+    if (timerSound.current !== null) timerSound.current = null
+    timerSound.current = new Audio(sound);
+    timerSound.current.currentTime = 0
     let count = 0;
     if (playAudio) {
       timerSound.current.play();
@@ -99,13 +101,16 @@ function App() {
         }
         if (count >= 10) {
           clearInterval(audioInterval);
+          timerSound.current.currentTime = 0
+          timerSound.current = null;
+          setPlayAudio(false)
         }
       }, 1000);
     }
     return () => {
       clearInterval(audioInterval);
-      timerSound.current.currentTime = 0;
       timerSound.current = null;
+
     };
   }, [playAudio]);
 
