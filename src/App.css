@@ -1,0 +1,40 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.input-container{
+  display: flex;
+  gap: 1rem;
+}
+
+.input-container .group{
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.input-container input {
+  font-size: 3.2rem;
+  width: calc(calc(4 * 3.2rem) / 3);
+  padding: 0.5rem;
+  padding-right: 1.2rem;
+  border: 0.2rem solid #fff;
+  border-radius: 0.5rem;
+  text-align: right;
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button{
+    appearance: none;
+  }
+}
+
+.btn{
+  margin-top: 2rem;
+}
+
+.btn-group{
+  display: flex;
+  gap: 0.8rem;
+}
