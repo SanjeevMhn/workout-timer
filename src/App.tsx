@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ChangeEvent,
-} from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import "./App.css";
 import sound from "./assets/timer.wav";
 import NoSleep from "nosleep.js";
@@ -52,14 +46,14 @@ function App() {
   const [timerReset, setTimerReset] = useState(false);
   const [playAudio, setPlayAudio] = useState(false);
   const [time, setTime] = useState(0);
-  const [totalTime, setTotalTime] = useState(0)
+  const [totalTime, setTotalTime] = useState(0);
   const convertTime = () => {
     let secTime = 0;
     if (hr > 0) secTime += 3600 * hr;
     if (min > 0) secTime += 60 * min;
     if (sec > 0) secTime += sec;
     setTime(secTime);
-    setTotalTime(secTime)
+    setTotalTime(secTime);
   };
 
   const resetTimer = () => {
@@ -71,8 +65,6 @@ function App() {
     setTimerStart(false);
     setTimerStop(false);
   };
-
-  const [elapsedTime, setElapsedTime] = useState<number>(0)
 
   useEffect(() => {
     let timeout: any;
@@ -93,7 +85,6 @@ function App() {
 
     return () => {
       clearTimeout(timeout);
-      // noSleep.disable();
     };
   }, [time, timerStop, timerReset]);
 
@@ -113,17 +104,12 @@ function App() {
         }
         if (count >= 10) {
           clearInterval(audioInterval);
-          // timerSound.current.currentTime = 0;
-          // timerSound.current = null;
           setPlayAudio(false);
         }
       }, 1000);
     }
     return () => {
       clearInterval(audioInterval);
-      // setPlayAudio(false)
-      // timerSound.current.currentTime = 0;
-      // timerSound.current = null;
     };
   }, [playAudio]);
 
@@ -140,18 +126,17 @@ function App() {
   const progressRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if(time > 0){
-      let progress = ((time/totalTime) * 100).toString()
+    if (time > 0) {
+      let progress = ((time / totalTime) * 100).toString();
       progressRef.current?.setAttribute("aria-valuenow", progress);
-      progressRef.current?.style.setProperty("--progress", `${progress}%`)
+      progressRef.current?.style.setProperty("--progress", `${progress}%`);
     }
-  },[time])
+  }, [time]);
 
   const handleStartTimer = () => {
     noSleep.enable();
     setTimerStart(true);
     progressRef.current?.setAttribute("role", "progressbar");
-    // progressRef.current?.setAttribute("aria-valuenow", "0");
     progressRef.current?.setAttribute("aria-live", "polite");
     convertTime();
   };
