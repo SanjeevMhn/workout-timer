@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from "react";
 import "./App.css";
 import sound from "./assets/timer.wav";
 import NoSleep from "nosleep.js";
@@ -46,12 +52,14 @@ function App() {
   const [timerReset, setTimerReset] = useState(false);
   const [playAudio, setPlayAudio] = useState(false);
   const [time, setTime] = useState(0);
+  const [totalTime, setTotalTime] = useState(0)
   const convertTime = () => {
     let secTime = 0;
     if (hr > 0) secTime += 3600 * hr;
     if (min > 0) secTime += 60 * min;
     if (sec > 0) secTime += sec;
     setTime(secTime);
+    setTotalTime(secTime)
   };
 
   const resetTimer = () => {
@@ -63,6 +71,8 @@ function App() {
     setTimerStart(false);
     setTimerStop(false);
   };
+
+  const [elapsedTime, setElapsedTime] = useState<number>(0)
 
   useEffect(() => {
     let timeout: any;
@@ -105,7 +115,7 @@ function App() {
           clearInterval(audioInterval);
           // timerSound.current.currentTime = 0;
           // timerSound.current = null;
-          setPlayAudio(false)
+          setPlayAudio(false);
         }
       }, 1000);
     }
@@ -127,85 +137,100 @@ function App() {
       .padStart(2, "0")} : ${secs.toString().padStart(2, "0")}`;
   }, [time]);
 
+  const progressRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if(time > 0){
+      let progress = ((time/totalTime) * 100).toString()
+      progressRef.current?.setAttribute("aria-valuenow", progress);
+      progressRef.current?.style.setProperty("--progress", `${progress}%`)
+    }
+  },[time])
+
   const handleStartTimer = () => {
     noSleep.enable();
     setTimerStart(true);
+    progressRef.current?.setAttribute("role", "progressbar");
+    // progressRef.current?.setAttribute("aria-valuenow", "0");
+    progressRef.current?.setAttribute("aria-live", "polite");
     convertTime();
   };
 
   return (
-    <>
-      {!timerStart ? (
-        <div className="input-container">
-          <div className="group">
-            <label htmlFor="" className="">
-              Hours
-            </label>
-            <input
-              type="number"
-              name=""
-              id=""
-              placeholder="00"
-              defaultValue={hr}
-              onBlur={(e: ChangeEvent<HTMLInputElement>) =>
-                handleInput(e, "hr")
-              }
-            />
+    <div className={`${timerStart ? "progress" : ""}`} ref={progressRef}>
+      <div className="inner">
+        {!timerStart ? (
+          <div className="input-container">
+            <div className="group">
+              <label htmlFor="" className="">
+                Hours
+              </label>
+              <input
+                type="number"
+                name=""
+                id=""
+                placeholder="00"
+                defaultValue={hr}
+                onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                  handleInput(e, "hr")
+                }
+              />
+            </div>
+            <div className="group">
+              <label htmlFor="">Minutes</label>
+              <input
+                type="number"
+                name=""
+                id=""
+                placeholder="00"
+                defaultValue={min}
+                onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                  handleInput(e, "min")
+                }
+              />
+            </div>
+            <div className="group">
+              <label htmlFor="">Seconds</label>
+              <input
+                type="number"
+                name=""
+                id=""
+                placeholder="00"
+                defaultValue={sec}
+                onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                  handleInput(e, "sec")
+                }
+              />
+            </div>
           </div>
-          <div className="group">
-            <label htmlFor="">Minutes</label>
-            <input
-              type="number"
-              name=""
-              id=""
-              placeholder="00"
-              defaultValue={min}
-              onBlur={(e: ChangeEvent<HTMLInputElement>) =>
-                handleInput(e, "min")
-              }
-            />
-          </div>
-          <div className="group">
-            <label htmlFor="">Seconds</label>
-            <input
-              type="number"
-              name=""
-              id=""
-              placeholder="00"
-              defaultValue={sec}
-              onBlur={(e: ChangeEvent<HTMLInputElement>) =>
-                handleInput(e, "sec")
-              }
-            />
-          </div>
-        </div>
-      ) : (
-        <h2>{countDown}</h2>
-      )}
+        ) : (
+          <h2>{countDown}</h2>
+        )}
 
-      {showStartbtn && !timerStart ? (
-        <button type="button" className="btn" onClick={handleStartTimer}>
-          Start
-        </button>
-      ) : timerStart ? (
-        <div className="btn-group">
-          <button
-            type="button"
-            className="btn"
-            onClick={() => setTimerReset(!timerReset)}
-          >
-            Reset
+        {showStartbtn && !timerStart ? (
+          <button type="button" className="btn" onClick={handleStartTimer}>
+            Start
           </button>
-          <button
-            type="button"
-            className="btn"
-            onClick={() => setTimerStop(!timerStop)}
-          >
-            {timerStop ? "Continue" : "Pause"}
-          </button>
-        </div>
-      ) : null}
-    </>
+        ) : timerStart ? (
+          <div className="btn-group">
+            <button
+              type="button"
+              className="btn"
+              onClick={() => setTimerReset(!timerReset)}
+            >
+              Reset
+            </button>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => setTimerStop(!timerStop)}
+            >
+              {timerStop ? "Continue" : "Pause"}
+            </button>
+          </div>
+        ) : null}
+      </div>
+    </div>
   );
 }
 

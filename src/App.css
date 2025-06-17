@@ -31,10 +31,43 @@
 }
 
 .btn{
-  margin-top: 2rem;
+  /* margin-top: 2rem; */
+  border: 2px solid #fff;
 }
 
 .btn-group{
   display: flex;
   gap: 0.8rem;
+}
+
+.progress{
+  display: grid;
+  place-items: center;
+  --size: min(350px, 90vw);
+  --bar-width: 30px;
+  width: var(--size);
+  aspect-ratio: 1 / 1;
+  background-image: conic-gradient(
+    orangered var(--progress, 0%),
+    gray 0%
+  );
+  border-radius: 50%;
+  position: relative;
+  isolation: isolate;
+
+  &::after{
+    content: '';
+    background-color: #121212;
+    border-radius: inherit;
+    width: calc(100% - var(--bar-width));
+    aspect-ratio: 1 / 1;
+    position: absolute;
+    display: grid;
+    z-index: -1;
+  }
+}
+.inner{
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
