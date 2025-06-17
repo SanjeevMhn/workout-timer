@@ -3,7 +3,7 @@ import "./App.css";
 import sound from "./assets/timer.wav";
 import NoSleep from "nosleep.js";
 
-var noSleep = new NoSleep()
+var noSleep = new NoSleep();
 
 function App() {
   const [hr, setHr] = useState<any>(undefined);
@@ -31,7 +31,11 @@ function App() {
   };
 
   const showStartbtn = useMemo(() => {
-    if ((hr !== undefined && hr > 0 ) || (min !== undefined && min > 0) || (sec !== undefined && sec > 0)) {
+    if (
+      (hr !== undefined && hr > 0) ||
+      (min !== undefined && min > 0) ||
+      (sec !== undefined && sec > 0)
+    ) {
       return true;
     }
     return false;
@@ -79,17 +83,17 @@ function App() {
 
     return () => {
       clearTimeout(timeout);
-      noSleep.disable()
+      // noSleep.disable();
     };
   }, [time, timerStop, timerReset]);
 
-  const timerSound = useRef<any>(null)
+  const timerSound = useRef<any>(null);
 
   useEffect(() => {
     let audioInterval: any;
-    if(timerSound.current == null) timerSound.current = new Audio(sound);
-    let count = 0;
     if (playAudio) {
+      timerSound.current = new Audio(sound);
+      let count = 0;
       timerSound.current.play();
       audioInterval = setInterval(() => {
         count++;
@@ -99,21 +103,19 @@ function App() {
         }
         if (count >= 10) {
           clearInterval(audioInterval);
+          // timerSound.current.currentTime = 0;
+          // timerSound.current = null;
+          setPlayAudio(false)
         }
       }, 1000);
     }
     return () => {
       clearInterval(audioInterval);
-      timerSound.current.currentTime = 0;
-      timerSound.current = null;
+      // setPlayAudio(false)
+      // timerSound.current.currentTime = 0;
+      // timerSound.current = null;
     };
   }, [playAudio]);
-
-  // useEffect(() => {
-  //   return () => {
-  //     noSleep.disable()
-  //   }
-  // },[])
 
   const countDown = useMemo(() => {
     let hours = Math.floor(time / 3600);
@@ -126,7 +128,7 @@ function App() {
   }, [time]);
 
   const handleStartTimer = () => {
-    noSleep.enable()
+    noSleep.enable();
     setTimerStart(true);
     convertTime();
   };
