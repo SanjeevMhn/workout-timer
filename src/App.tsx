@@ -189,7 +189,7 @@ function App() {
             </div>
           </div>
         ) : (
-          <h2>{countDown}</h2>
+          <h2 className="count-down">{countDown}</h2>
         )}
 
         {showStartbtn && !timerStart ? (

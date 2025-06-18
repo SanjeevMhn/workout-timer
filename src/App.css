@@ -71,3 +71,7 @@
   flex-direction: column;
   gap: 2rem;
 }
+
+.count-down{
+  font-size: 3.5rem;
+}
