@@ -12,6 +12,7 @@ export default defineConfig({
       devOptions: {
         enabled: true,
       },
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       injectRegister: "auto",
       manifest: {
         name: "Workout Timer",
