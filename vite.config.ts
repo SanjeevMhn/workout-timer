@@ -4,6 +4,7 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: "https://sanjeevmhn.github.io/workout-timer",
   plugins: [
     react(),
     VitePWA({
