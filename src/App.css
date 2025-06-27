@@ -5,18 +5,19 @@
   text-align: center;
 }
 
-.input-container{
+.input-container {
   display: flex;
   gap: 1rem;
+  margin: 0 auto;
 }
 
-.input-container .group{
+.input-container .group {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
 }
 
-.input-container input {
+input {
   font-size: 3.2rem;
   width: calc(calc(4 * 3.2rem) / 3);
   padding: 0.5rem;
@@ -25,38 +26,35 @@
   border-radius: 0.5rem;
   text-align: right;
   &::-webkit-inner-spin-button,
-  &::-webkit-outer-spin-button{
+  &::-webkit-outer-spin-button {
     appearance: none;
   }
 }
 
-.btn{
+.btn {
   /* margin-top: 2rem; */
   border: 2px solid #fff;
 }
 
-.btn-group{
+.btn-group {
   display: flex;
   gap: 0.8rem;
 }
 
-.progress{
+.progress {
   display: grid;
   place-items: center;
   --size: min(350px, 90vw);
   --bar-width: 30px;
   width: var(--size);
   aspect-ratio: 1 / 1;
-  background-image: conic-gradient(
-    orangered var(--progress, 0%),
-    gray 0%
-  );
+  background-image: conic-gradient(orangered var(--progress, 0%), gray 0%);
   border-radius: 50%;
   position: relative;
   isolation: isolate;
 
-  &::after{
-    content: '';
+  &::after {
+    content: "";
     background-color: #121212;
     border-radius: inherit;
     width: calc(100% - var(--bar-width));
@@ -66,12 +64,74 @@
     z-index: -1;
   }
 }
-.inner{
+.inner {
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
 
-.count-down{
+.count-down {
   font-size: 3.75rem;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  gap: 1rem;
+  input[type="checkbox"] {
+    --size: 2.5rem;
+    width: var(--size);
+    aspect-ratio: 1 / 1;
+  }
+}
+
+.rest-time-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  font-size: 2rem;
+  input[type="number"] {
+    font-size: 2rem;
+    text-align: center;
+  }
+}
+
+.timer-outer {
+  position: relative;
+  .total-rounds {
+    --size: 8rem;
+    position: absolute;
+    top: calc(-1.5 * var(--size));
+    left: 50%;
+    transform: translateX(-50%);
+    width: var(--size);
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 3.5rem;
+    isolation: isolate;
+    &::after {
+      content: "";
+      position: absolute;
+      width: 125%;
+      aspect-ratio: 1 / 1;
+      /* background-color: turquoise; */
+      background-image: conic-gradient(orangered var(--progress, 0%), gray 0%);
+      border-radius: 50%;
+      z-index: -2;
+    }
+    &::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background-color: #121212;
+      z-index: -1;
+      border-radius: 50%;
+    }
+  }
 }

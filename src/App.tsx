@@ -64,6 +64,9 @@ function App() {
     setTimerReset(false);
     setTimerStart(false);
     setTimerStop(false);
+    setIsInterval(false);
+    setRestTime(30)
+    setTotalRounds(1)
   };
 
   useEffect(() => {
@@ -141,53 +144,105 @@ function App() {
     convertTime();
   };
 
+  const [isInterval, setIsInterval] = useState<boolean>(false);
+  const [restTime, setRestTime] = useState<number>(30);
+  const [totalRounds, setTotalRounds] = useState<number>(1)
+
   return (
-    <div className={`${timerStart ? "progress" : ""}`} ref={progressRef}>
+    <div className={`timer-outer ${timerStart ? "progress" : ""}`} ref={progressRef}>
+      {(isInterval && timerStart ) && <span className="total-rounds">{totalRounds}</span>}
       <div className="inner">
         {!timerStart ? (
-          <div className="input-container">
-            <div className="group">
-              <label htmlFor="" className="">
-                Hours
+          <>
+            <div className="input-container">
+              <div className="group">
+                <label htmlFor="" className="">
+                  Hours
+                </label>
+                <input
+                  type="number"
+                  name=""
+                  id=""
+                  placeholder="00"
+                  defaultValue={hr}
+                  onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                    handleInput(e, "hr")
+                  }
+                />
+              </div>
+              <div className="group">
+                <label htmlFor="">Minutes</label>
+                <input
+                  type="number"
+                  name=""
+                  id=""
+                  placeholder="00"
+                  defaultValue={min}
+                  onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                    handleInput(e, "min")
+                  }
+                />
+              </div>
+              <div className="group">
+                <label htmlFor="">Seconds</label>
+                <input
+                  type="number"
+                  name=""
+                  id=""
+                  placeholder="00"
+                  defaultValue={sec}
+                  onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                    handleInput(e, "sec")
+                  }
+                />
+              </div>
+            </div>
+            <div className="group checkbox-container">
+              <input
+                type="checkbox"
+                name=""
+                id="interval"
+                className="form-control checkbox"
+                onChange={() => setIsInterval(!isInterval)}
+              />
+              <label htmlFor="interval" className="form-label">
+                Interval Training
               </label>
-              <input
-                type="number"
-                name=""
-                id=""
-                placeholder="00"
-                defaultValue={hr}
-                onBlur={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleInput(e, "hr")
-                }
-              />
             </div>
-            <div className="group">
-              <label htmlFor="">Minutes</label>
-              <input
-                type="number"
-                name=""
-                id=""
-                placeholder="00"
-                defaultValue={min}
-                onBlur={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleInput(e, "min")
-                }
-              />
-            </div>
-            <div className="group">
-              <label htmlFor="">Seconds</label>
-              <input
-                type="number"
-                name=""
-                id=""
-                placeholder="00"
-                defaultValue={sec}
-                onBlur={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleInput(e, "sec")
-                }
-              />
-            </div>
-          </div>
+            {isInterval ? (
+              <>
+                <span className="info">(Note - The time set above will be divided based on the rounds and rest time)</span>
+                <div className="group rest-time-container">
+                  <label htmlFor="rounds">Total Rounds</label>
+                  <input
+                    type="number"
+                    name=""
+                    id=""
+                    className="form-control"
+                    placeholder="Total Rounds"
+                    defaultValue={totalRounds}
+                    onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                      setTotalRounds(Number(e.target.value))
+                    }
+                  />
+                </div>
+                <div className="group rest-time-container">
+                  <label htmlFor="rest-time">Rest Time (in Seconds)</label>
+                  <input
+                    type="number"
+                    name=""
+                    id=""
+                    className="form-control"
+                    placeholder="Rest Time"
+                    defaultValue={restTime}
+                    onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                      setRestTime(Number(e.target.value))
+                    }
+                  />
+                </div>
+              </>
+            ) : null}
+          </>
         ) : (
           <h2 className="count-down">{countDown}</h2>
         )}
