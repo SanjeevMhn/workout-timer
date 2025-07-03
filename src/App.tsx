@@ -49,9 +49,15 @@ function App() {
   const [totalTime, setTotalTime] = useState(0);
   const convertTime = () => {
     let secTime = 0;
-    if (hr > 0) secTime += 3600 * hr;
-    if (min > 0) secTime += 60 * min;
-    if (sec > 0) secTime += sec;
+    if (!showIntervalTimer) {
+      if (hr > 0) secTime += 3600 * hr;
+      if (min > 0) secTime += 60 * min;
+      if (sec > 0) secTime += sec;
+    } else {
+      if (intervalTime > 0) {
+        secTime += intervalTimeType == "min" ? 60 * intervalTime : intervalTime;
+      }
+    }
     setTime(secTime);
     setTotalTime(secTime);
   };
@@ -71,16 +77,38 @@ function App() {
     if (timerReset) {
       resetTimer();
     }
-    if (time > 0 && !timerStop) {
-      timeout = setTimeout(() => {
-        let newTime = time - 1;
-        if (newTime > 0) {
-          setTime(newTime);
-        } else {
-          resetTimer();
-          setPlayAudio(true);
-        }
-      }, 1000);
+    if (!showIntervalTimer) {
+      if (time > 0 && !timerStop) {
+        timeout = setTimeout(() => {
+          let newTime = time - 1;
+          if (newTime > 0) {
+            setTime(newTime);
+          } else {
+            resetTimer();
+            setPlayAudio(true);
+          }
+        }, 1000);
+      }
+    } else {
+      if (time > 0 && !timerStop && intervalRound > 0 && !intervalRestStart) {
+        timeout = setTimeout(() => {
+          let newTime = time - 1;
+          if (newTime > 0) {
+            setTime(newTime);
+          } else {
+            if (intervalRound > 0) {
+              setIntervalRest(intervalRound - 1);
+              setIntervalRestStart(true);
+              setPlayAudio(true);
+            } else {
+              setPlayAudio(true)
+              setIntervalRestStart(false);
+              resetTimer();
+              clearTimeout(timeout)
+            }
+          }
+        }, 1000);
+      }
     }
 
     return () => {
@@ -141,53 +169,204 @@ function App() {
     convertTime();
   };
 
+  const [showIntervalTimer, setShowIntervalTimer] = useState<boolean>(false);
+  const [intervalRound, setIntervalRound] = useState<number>(1);
+  const [intervalTime, setIntervalTime] = useState<number>(1);
+  const [intervalRest, setIntervalRest] = useState<number>(1);
+  const [intervalRestStart, setIntervalRestStart] = useState<boolean>(false);
+  const [intervalTimeType, setIntervalTimeType] = useState<
+    "min" | "sec" | string
+  >("min");
+  const [intervalRestTimeType, setIntervalRestTimeType] = useState<
+    "min" | "sec" | string
+  >("sec");
+
+  useEffect(() => {
+    let timeout: any;
+    if (intervalRestStart) {
+      let resetTime =
+        intervalRestTimeType == "min" ? 60 * intervalRest : intervalRest;
+      timeout = setTimeout(() => {
+        if (resetTime > 0) {
+          resetTime = resetTime - 1;
+        } else {
+          setIntervalRestStart(false);
+          // setTime(intervalTime)
+          convertTime()
+          clearTimeout(timeout);
+        }
+      }, 1000);
+    }
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [intervalRestStart]);
+
   return (
     <div className={`${timerStart ? "progress" : ""}`} ref={progressRef}>
       <div className="inner">
+        {!timerStart && (
+          <ul className="tab-list">
+            <li className="item">
+              <button
+                type="button"
+                className={`${!showIntervalTimer && "active"}`}
+                onClick={() => setShowIntervalTimer(false)}
+              >
+                Timer
+              </button>
+            </li>
+            <li className="item">
+              <button
+                type="button"
+                className={`${showIntervalTimer && "active"}`}
+                onClick={() => setShowIntervalTimer(true)}
+              >
+                Interval Timer
+              </button>
+            </li>
+          </ul>
+        )}
         {!timerStart ? (
-          <div className="input-container">
-            <div className="group">
-              <label htmlFor="" className="">
-                Hours
-              </label>
-              <input
-                type="number"
-                name=""
-                id=""
-                placeholder="00"
-                defaultValue={hr}
-                onBlur={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleInput(e, "hr")
-                }
-              />
+          !showIntervalTimer ? (
+            <>
+              <div className="input-container">
+                <div className="group">
+                  <label htmlFor="" className="">
+                    Hours
+                  </label>
+                  <input
+                    type="number"
+                    name=""
+                    id=""
+                    placeholder="00"
+                    defaultValue={hr}
+                    onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                      handleInput(e, "hr")
+                    }
+                  />
+                </div>
+                <div className="group">
+                  <label htmlFor="">Minutes</label>
+                  <input
+                    type="number"
+                    name=""
+                    id=""
+                    placeholder="00"
+                    defaultValue={min}
+                    onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                      handleInput(e, "min")
+                    }
+                  />
+                </div>
+                <div className="group">
+                  <label htmlFor="">Seconds</label>
+                  <input
+                    type="number"
+                    name=""
+                    id=""
+                    placeholder="00"
+                    defaultValue={sec}
+                    onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                      handleInput(e, "sec")
+                    }
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="interval-timer-form">
+              <div className="form-group">
+                <label htmlFor="rounds" className="form-label">
+                  Total Rounds
+                </label>
+                <input
+                  type="number"
+                  name=""
+                  id="rounds"
+                  className="form-control"
+                  defaultValue={intervalRound}
+                  onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                    Number(e.target.value) > 0 &&
+                    setIntervalRound(Number(e.target.value))
+                  }
+                />
+              </div>
+              <div className="form-group">
+                <div className="label-container">
+                  <label htmlFor="time" className="form-label">
+                    Time per round
+                  </label>
+                  <select
+                    name=""
+                    id=""
+                    defaultValue={intervalTimeType}
+                    onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                      e.target.value !== "" &&
+                      setIntervalTimeType(e.target.value)
+                    }
+                  >
+                    <option value="">Select Time Type</option>
+                    <option value="min">Minutes</option>
+                    <option value="sec">Seconds</option>
+                  </select>
+                </div>
+
+                <input
+                  type="number"
+                  name=""
+                  id="time"
+                  className="form-control"
+                  defaultValue={intervalTime}
+                  onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                    Number(e.target.value) > 0 &&
+                    setIntervalTime(Number(e.target.value))
+                  }
+                />
+              </div>
+              <div className="form-group">
+                <div className="label-container">
+                  <label htmlFor="rest" className="form-label">
+                    Rest per round
+                  </label>
+                  <select
+                    name=""
+                    id=""
+                    defaultValue={intervalRestTimeType}
+                    onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                      e.target.value !== "" &&
+                      setIntervalRestTimeType(e.target.value)
+                    }
+                  >
+                    <option value="">Select Time Type</option>
+                    <option value="min">Minutes</option>
+                    <option value="sec">Seconds</option>
+                  </select>
+                </div>
+
+                <input
+                  type="number"
+                  name=""
+                  id="rest"
+                  className="form-control"
+                  defaultValue={intervalRest}
+                  onBlur={(e: ChangeEvent<HTMLInputElement>) =>
+                    Number(e.target.value) > 0 &&
+                    setIntervalRest(Number(e.target.value))
+                  }
+                />
+              </div>
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={handleStartTimer}
+                >
+                  Start
+                </button>
+              </div>
             </div>
-            <div className="group">
-              <label htmlFor="">Minutes</label>
-              <input
-                type="number"
-                name=""
-                id=""
-                placeholder="00"
-                defaultValue={min}
-                onBlur={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleInput(e, "min")
-                }
-              />
-            </div>
-            <div className="group">
-              <label htmlFor="">Seconds</label>
-              <input
-                type="number"
-                name=""
-                id=""
-                placeholder="00"
-                defaultValue={sec}
-                onBlur={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleInput(e, "sec")
-                }
-              />
-            </div>
-          </div>
+          )
         ) : (
           <h2 className="count-down">{countDown}</h2>
         )}
